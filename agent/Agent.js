@@ -14,6 +14,7 @@ var {EventEmitter} = require('events');
 
 var assign = require('object-assign');
 var guid = require('../utils/guid');
+var immutableUtils = require('./immutableUtils');
 
 import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
 
@@ -375,7 +376,11 @@ class Agent extends EventEmitter {
 
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
+    var alt;
+    if (immutableUtils.isImmutable(obj)) {
+      alt = obj.get(attr);
+    }
+    return obj ? alt || obj[attr] : null;
   }, base);
 }
 
